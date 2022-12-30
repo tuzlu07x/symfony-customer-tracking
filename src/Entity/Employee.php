@@ -2,12 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\EmployeeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\EmployeeRepository;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 class Employee
@@ -161,5 +165,21 @@ class Employee
             'social_security_number' => $this->social_security_number,
             'citizen_number' => $this->citizen_number,
         ];
+    }
+
+    public function serialized($datas)
+    {
+        $serialize = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
+
+        $response = new Response($serialize->serialize($datas, 'json', [
+            'circular_reference_handler' => function ($object) {
+                return $object->getId();
+            },
+            'ignored_attributes' => ['employee'],
+            'datetime_format' => 'Y-m-d H:i:s',
+        ]));
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 }

@@ -23,3 +23,23 @@ employee_delete:
   path: /employee/{employee}
   controller: App\Controller\EmployeeController::delete
   methods: DELETE
+
+leave_index:
+  path: /employee/{employee}/leave
+  controller: App\Controller\LeaveController::index
+  methods: GET
+
+leave_add:
+  path: /employee/{employee}/leave
+  controller: App\Controller\LeaveController::add
+  methods: POST
+
+leave_update:
+  path: /employee/{employee}/leave/{leave}/update
+  controller: App\Controller\LeaveController::update
+  methods: PUT
+
+leave_delete:
+  path: /employee/{employee}/leave/{leave}/delete
+  controller: App\Controller\LeaveController::delete
+  methods: DELETE

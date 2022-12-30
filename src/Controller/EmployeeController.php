@@ -19,7 +19,6 @@ class EmployeeController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-
     public function index()
     {
         $employees = $this->entityManager->getRepository(Employee::class)->findAll();
