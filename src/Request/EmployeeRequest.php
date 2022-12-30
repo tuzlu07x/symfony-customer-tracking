@@ -9,15 +9,12 @@ use Symfony\Component\Validator\Constraints\Type;
 class EmployeeRequest extends BaseRequest
 {
     #[Type('string')]
-    #[NotBlank]
     protected $first_name;
 
     #[Type('string')]
-    #[NotBlank]
     protected $last_name;
 
     #[Type('string')]
-    #[NotBlank]
     protected $social_security_number;
 
     #[Type('string')]

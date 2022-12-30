@@ -13,3 +13,13 @@ employee_add:
   path: /employee
   controller: App\Controller\EmployeeController::add
   methods: POST
+
+employee_update:
+  path: /employee/{employee}
+  controller: App\Controller\EmployeeController::update
+  methods: PUT
+
+employee_delete:
+  path: /employee/{employee}
+  controller: App\Controller\EmployeeController::delete
+  methods: DELETE
