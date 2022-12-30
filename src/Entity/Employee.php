@@ -17,8 +17,6 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 class Employee
 {
-    use SearchTrait;
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -184,17 +182,5 @@ class Employee
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
-    }
-
-    public function search($query, $search)
-    {
-        $terms = $this->splitName($search);
-
-        foreach ($terms as $term) {
-            $query->where(function ($query) use ($term) {
-                $query->where('first_name', 'like', '%' . $term[0] . '%')
-                    ->orWhere('last_name', 'like', '%' . $term[1] . '%');
-            });
-        }
     }
 }

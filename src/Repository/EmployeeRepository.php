@@ -3,8 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Employee;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Traits\SearchTrait;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Employee>
@@ -16,6 +17,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class EmployeeRepository extends ServiceEntityRepository
 {
+    use SearchTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Employee::class);
@@ -39,11 +42,38 @@ class EmployeeRepository extends ServiceEntityRepository
         }
     }
 
-    public function search($search)
+    public function searchFullName($fullName)
     {
-        $query = $this->createQueryBuilder('e');
+        $terms = $this->splitName($fullName);
+        $queryBuilder = $this->createQueryBuilder('e');
 
-        return $this->scopeSearch($query, $search);
+        foreach ($terms as $term) {
+            return $queryBuilder
+                ->andWhere('e.first_name LIKE :first_name')
+                ->orWhere('e.last_name LIKE :last_name')
+                ->setParameter('first_name', '%' . $term[0] . '%')
+                ->setParameter('last_name', '%' . $term[1] . '%')
+                ->getQuery()
+                ->getResult();
+        }
+    }
+
+    public function searchBetweenDates($startDate, $endDate, $leave = null)
+    {
+        $queryBuilder = $this->createQueryBuilder('e')
+            ->leftJoin('e.leaves', 'l')
+            ->andWhere('l.start_date >= :start_date')
+            ->andWhere('l.end_date <= :end_date')
+            ->setParameter('start_date', $startDate)
+            ->setParameter('end_date', $endDate);
+
+        if ($leave) {
+            $queryBuilder->andWhere('l.id IS NOT NULL');
+        } elseif ($leave === false) {
+            $queryBuilder->andWhere('l.id IS NULL');
+        }
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
 
