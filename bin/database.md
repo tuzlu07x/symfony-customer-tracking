@@ -1,4 +1,4 @@
-# Employe
+# Employee
 
 - id
 - first_name string

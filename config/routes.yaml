@@ -1,5 +1,10 @@
 controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+  resource:
+    path: ../src/Controller/
+    namespace: App\Controller
+  type: attribute
+
+employee_index:
+  path: /employee
+  controller: App\Controller\EmployeeController::index
+  methods: GET
