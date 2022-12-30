@@ -15,10 +15,13 @@ class EmployeeController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    public function index()
+
+    public function index(): Response
     {
         $employees = $this->entityManager->getRepository(Employee::class)->findAll();
 
-        return $this->json($employees);
+        return $this->json([
+            'employees' => $employees
+        ], 200, [], ['groups' => ['main']]);
     }
 }
