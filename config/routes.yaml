@@ -43,3 +43,8 @@ leave_delete:
   path: /employee/{employee}/leave/{leave}/delete
   controller: App\Controller\LeaveController::delete
   methods: DELETE
+
+filter_index:
+  path: /filter
+  controller: App\Controller\FilterController::index
+  methods: GET
