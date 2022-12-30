@@ -65,4 +65,14 @@ class Leave
 
         return $this;
     }
+
+    public function __serialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'employee' => $this->employee,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+        ];
+    }
 }

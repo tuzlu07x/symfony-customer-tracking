@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 class Employee
@@ -147,5 +148,18 @@ class Employee
         }
 
         return $this;
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+            'social_security_number' => $this->social_security_number,
+            'citizen_number' => $this->citizen_number,
+        ];
     }
 }

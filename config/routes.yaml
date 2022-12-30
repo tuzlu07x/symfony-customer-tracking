@@ -8,3 +8,8 @@ employee_index:
   path: /employee
   controller: App\Controller\EmployeeController::index
   methods: GET
+
+employee_add:
+  path: /employee
+  controller: App\Controller\EmployeeController::add
+  methods: POST
