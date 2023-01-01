@@ -6,6 +6,12 @@ use App\Entity\Employee;
 use App\Traits\SearchTrait;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @extends ServiceEntityRepository<Employee>
@@ -61,6 +67,7 @@ class EmployeeRepository extends ServiceEntityRepository
     public function searchBetweenDates($startDate, $endDate, $leave = null)
     {
         $queryBuilder = $this->createQueryBuilder('e')
+            ->where('e.end_date IS NULL')
             ->leftJoin('e.leaves', 'l')
             ->andWhere('l.start_date >= :start_date')
             ->andWhere('l.end_date <= :end_date')
@@ -76,6 +83,65 @@ class EmployeeRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    public function whereDoestnHave($startDate, $endDate, $notLeave)
+    {
+        $queryBuilder = $this->createQueryBuilder('e')
+            ->where('e.end_date IS NULL')
+            ->leftJoin('e.leaves', 'l')
+            ->andWhere('l.start_date >= :start_date')
+            ->andWhere('l.end_date <= :end_date')
+            ->setParameter('start_date', $startDate)
+            ->setParameter('end_date', $endDate);
+
+        if ($notLeave) {
+            $queryBuilder->andWhere('l.id IS NULL');
+        } elseif ($notLeave === false) {
+            $queryBuilder->andWhere('l.id IS NOT NULL');
+        }
+
+        $query = $queryBuilder->getQuery()->getResult();
+
+        return $query;
+    }
+
+    public function whereDoesHave($startDate, $endDate, $leave)
+    {
+        $queryBuilder = $this->createQueryBuilder('e')
+            ->where('e.end_date IS NULL')
+            ->leftJoin('e.leaves', 'l')
+            ->andWhere('l.start_date >= :start_date')
+            ->andWhere('l.end_date <= :end_date')
+            ->setParameter('start_date', $startDate)
+            ->setParameter('end_date', $endDate);
+
+        if ($leave) {
+            $queryBuilder->andWhere('l.id IS NOT NULL');
+        } elseif ($leave === false) {
+            $queryBuilder->andWhere('l.id IS NULL');
+        }
+
+        $query = $queryBuilder->getQuery()->getResult();
+
+        return $query;
+    }
+
+    public function serializeFilter($datas)
+    {
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $serializer = new Serializer($normalizers, $encoders);
+        $jsonContent = $serializer->serialize($datas, 'json', [
+            'circular_reference_handler' => function ($object) {
+                return $object->getId();
+            },
+            'ignored_attributes' => ['leaves'],
+            'datetime_format' => 'Y-m-d H:i:s',
+        ]);
+        $response = new Response($jsonContent);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
 
     //    /**
     //     * @return Employee[] Returns an array of Employee objects

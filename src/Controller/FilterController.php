@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class FilterController extends AbstractController
 {
@@ -17,7 +20,8 @@ class FilterController extends AbstractController
     {
         $this->entityManager = $entityManager;
     }
-    public function index(Request $request): JsonResponse
+
+    public function index(Request $request)
     {
         $fullName = $request->get('fullName');
         $startDate = $request->get('startDate');
@@ -31,20 +35,18 @@ class FilterController extends AbstractController
         }
 
         if ($startDate && $endDate) {
-            if ($leave) {
+            if ($notLeave == true) {
                 $employees = $this->entityManager->getRepository(Employee::class)
-                    ->searchBetweenDates($startDate, $endDate, true);
-            } elseif ($notLeave) {
-                $employees = $this->entityManager->getRepository(Employee::class)
-                    ->searchBetweenDates($startDate, $endDate, false);
-            } else {
-                $employees = $this->entityManager->getRepository(Employee::class)
-                    ->searchBetweenDates($startDate, $endDate);
+                    ->whereDoestnHave($startDate, $endDate, $notLeave);
             }
-            $employees = $this->entityManager->getRepository(Employee::class)
-                ->searchBetweenDates($startDate, $endDate);
-        }
 
-        return new JsonResponse($employees);
+            if ($leave == true) {
+                $employees = $this->entityManager->getRepository(Employee::class)
+                    ->whereDoesHave($startDate, $endDate, $leave);
+            }
+
+            return $this->entityManager->getRepository(Employee::class)
+                ->serializeFilter($employees);
+        }
     }
 }
