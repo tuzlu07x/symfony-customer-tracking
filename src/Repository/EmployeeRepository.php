@@ -6,8 +6,6 @@ use App\Entity\Employee;
 use App\Traits\SearchTrait;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -125,7 +123,7 @@ class EmployeeRepository extends ServiceEntityRepository
         return $query;
     }
 
-    public function serializeFilter($datas)
+    public function serialize($datas)
     {
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];

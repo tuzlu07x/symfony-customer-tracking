@@ -6,10 +6,6 @@ use DateTime;
 use App\Entity\Employee;
 use App\Request\EmployeeRequest;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class EmployeeController extends AbstractController
@@ -22,20 +18,9 @@ class EmployeeController extends AbstractController
     public function index()
     {
         $employees = $this->entityManager->getRepository(Employee::class)->findAll();
-        $encoders = [new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer()];
-        $serializer = new Serializer($normalizers, $encoders);
-        $jsonContent = $serializer->serialize($employees, 'json', [
-            'circular_reference_handler' => function ($object) {
-                return $object->getId();
-            },
-            'ignored_attributes' => ['leaves'],
-            'datetime_format' => 'Y-m-d H:i:s',
-        ]);
-        $response = new Response($jsonContent);
-        $response->headers->set('Content-Type', 'application/json');
 
-        return $response;
+        return $this->entityManager->getRepository(Employee::class)
+            ->serialize($employees);
     }
 
     public function add(EmployeeRequest $request)
@@ -68,21 +53,7 @@ class EmployeeController extends AbstractController
         $this->entityManager->persist($employee);
         $this->entityManager->flush();
 
-        $encoders = [new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer()];
-        $serializer = new Serializer($normalizers, $encoders);
-        $jsonContent = $serializer->serialize($employee, 'json', [
-            'circular_reference_handler' => function ($object) {
-                return $object->getId();
-            },
-            'ignored_attributes' => ['leaves'],
-            'datetime_format' => 'Y-m-d H:i:s',
-        ]);
-
-        $response = new Response($jsonContent);
-        $response->headers->set('Content-Type', 'application/json');
-
-        return $response;
+        return $this->entityManager->getRepository(Employee::class)->serialize($employee);
     }
 
     public function delete(Employee $employee)
