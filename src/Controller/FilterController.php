@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Leave;
 use App\Entity\Employee;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -39,9 +37,9 @@ class FilterController extends AbstractController
                 $employees = $this->entityManager->getRepository(Employee::class)
                     ->whereDoesHave($startDate, $endDate, $leave);
             }
-
-            return $this->entityManager->getRepository(Employee::class)
-                ->serialize($employees);
         }
+
+        return $this->entityManager->getRepository(Employee::class)
+            ->serialize($employees);
     }
 }
